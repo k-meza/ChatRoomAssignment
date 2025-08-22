@@ -9,8 +9,6 @@ ServicesConfiguration.RegisterServices(builder.Services, builder.Configuration);
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
     .CreateLogger();
 
 builder.Services.AddSerilog();

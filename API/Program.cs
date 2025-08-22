@@ -15,7 +15,6 @@ ServicesConfiguration.RegisterServices(builder.Services, builder.Configuration);
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
     .CreateLogger();
 
 builder.Host.UseSerilog();

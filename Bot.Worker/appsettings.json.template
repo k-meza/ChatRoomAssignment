@@ -1,10 +1,10 @@
 {
-"Serilog": {
+  "Serilog": {
     "MinimumLevel": {
       "Default": "Information",
       "Override": {
-        "Microsoft": "Warning",
-        "System": "Warning"
+        "Microsoft": "Information",
+        "System": "Information"
       }
     },
     "WriteTo": [
@@ -24,4 +24,4 @@
       "Application": "ChatRoomAssignment Bot Worker"
     }
   }
- }
+}
