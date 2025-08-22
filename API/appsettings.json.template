@@ -24,7 +24,7 @@
       "WithThreadId"
     ],
     "Properties": {
-      "Application": "MyApp"
+      "Application": "ChatRoomAssignment API"
     }
   },
   "AllowedHosts": "*"
