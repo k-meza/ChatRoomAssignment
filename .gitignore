@@ -419,3 +419,4 @@ FodyWeavers.xsd
 
 # AppSettings
 API/appsettings.json
+Bot.Worker/appsettings.json
