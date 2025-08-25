@@ -1,9 +1,10 @@
 @page "/rooms"
-@using WebApp.Services
 
 @if (!State.IsAuthenticated)
 {
     <p>Please sign in to see rooms.</p>
+    <button @onclick="GoToLogin"> Go to Login</button>
+
 }
 else
 {
@@ -74,4 +75,6 @@ else
     }
 
     private void GoChat(Guid id) => Nav.NavigateTo($"/chat/{id}");
+    private void GoToLogin() => Nav.NavigateTo("/");
+
 }

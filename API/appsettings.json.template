@@ -2,17 +2,17 @@
   "ConnectionStrings": {
     "AppDbContext": "Data Source=chatroom.db"
   },
-  "RabbitMq": {
-    "HostName": "",
-    "UserName": "",
-    "Password": "",
-    "VirtualHost": "",
-    "Port": 5672,
-    "CommandsQueue": "",
-    "EventsQueue": "",
-    "CommandsExchange": "",
-    "EventsExchange": ""
-  },
+  "RabbitMqOptions": {
+      "HostName": "localhost",
+      "UserName": "guest",
+      "Password": "guest",
+      "VirtualHost": "/",
+      "Port": 5672,
+      "CommandsQueue": "stock-commands",
+      "EventsQueue": "bot-messages",
+      "CommandsExchange": "chat-commands",
+      "EventsExchange": "chat-events"
+    },
   "Serilog": {
     "MinimumLevel": {
       "Default": "Information",

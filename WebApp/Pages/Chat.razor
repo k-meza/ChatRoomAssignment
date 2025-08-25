@@ -1,9 +1,7 @@
 @page "/chat/{RoomId:guid}"
 @using Microsoft.AspNetCore.SignalR.Client
-@using WebApp.Services
 @inject ChatService ChatSvc
 @inject AppState State
-@inject NavigationManager Nav
 @inject AuthService Auth
 @inject IJSRuntime JS
 
@@ -82,55 +80,6 @@ else
                 }
             });
 
-            // If the above doesn't work, uncomment this alternative approach:
-            /*
-            hub.On<object>("ReceiveMessage", async (payload) =>
-            {
-                try
-                {
-                    Console.WriteLine($"Raw payload: {System.Text.Json.JsonSerializer.Serialize(payload)}");
-                    
-                    var doc = System.Text.Json.JsonDocument.Parse(System.Text.Json.JsonSerializer.Serialize(payload));
-                    var root = doc.RootElement;
-                    
-                    // Check if all required properties exist before accessing them
-                    if (!root.TryGetProperty("Id", out var idProp) ||
-                        !root.TryGetProperty("Content", out var contentProp) ||
-                        !root.TryGetProperty("UserName", out var userNameProp) ||
-                        !root.TryGetProperty("CreatedAtUtc", out var createdProp) ||
-                        !root.TryGetProperty("IsBotMessage", out var isBotProp))
-                    {
-                        Console.WriteLine("Missing required properties in message payload");
-                        Console.WriteLine($"Available properties: {string.Join(", ", root.EnumerateObject().Select(p => p.Name))}");
-                        return;
-                    }
-                    
-                    var newMessage = new ChatMessageDto
-                    {
-                        Id = idProp.GetGuid(),
-                        Content = contentProp.GetString() ?? "",
-                        UserName = userNameProp.GetString() ?? "",
-                        CreatedAtUtc = createdProp.GetDateTime(),
-                        IsBotMessage = isBotProp.GetBoolean()
-                    };
-                    
-                    // Add message to list
-                    messages.Add(newMessage);
-                    
-                    // Trigger UI update
-                    await InvokeAsync(StateHasChanged);
-                    
-                    // Scroll to bottom
-                    await ScrollToBottom();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error processing received message: {ex.Message}");
-                    Console.WriteLine($"Payload type: {payload?.GetType()}");
-                }
-            });
-            */
-
             // Handle message loading
             hub.On<IEnumerable<ChatMessageDto>>("LoadMessages", async (msgs) =>
             {
@@ -176,7 +125,7 @@ else
     {
         try
         {
-            await Task.Delay(50); // Give time for DOM to update
+            await Task.Delay(50); 
             await JS.InvokeVoidAsync("scrollToBottom", messagesDiv);
         }
         catch
