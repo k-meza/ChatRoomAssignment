@@ -38,5 +38,11 @@
       "Application": "ChatRoomAssignment API"
     }
   },
+  "Cors": {
+      "AllowedOrigins": [
+        "http://localhost:5149",
+        "https://localhost:5173"
+      ]
+    },
   "AllowedHosts": "*"
 }
