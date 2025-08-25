@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Repositories.AppDbContext;
 
-public class AppDbContext : IdentityDbContext<AppUser>
+public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
-    public DbSet<ChatRoom> ChatRooms => Set<ChatRoom>();
-    public DbSet<Message> Messages => Set<Message>();
+    public DbSet<ChatRoom> ChatRooms { get; set; }
+    public DbSet<Message> Messages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder b)
     {
