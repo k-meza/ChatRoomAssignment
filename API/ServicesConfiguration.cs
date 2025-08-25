@@ -22,7 +22,7 @@ public static class ServicesConfiguration
 
 
         // Repositories
-        services.AddDbContext<AppDbContext>(options =>
+        services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("AppDbContext")));
 
         
