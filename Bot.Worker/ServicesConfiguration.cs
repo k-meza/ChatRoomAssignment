@@ -1,3 +1,6 @@
+using Bot.Worker.Options;
+using Bot.Worker.Services;
+using Bot.Worker.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace Bot.Worker;
@@ -6,7 +9,19 @@ public static class ServicesConfiguration
 {
     public static void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
+        // Configuration
+        services.AddOptionsAsSelf<RabbitMqOptions>(configuration.GetSection("RabbitMqOptions"));
+
+        // Services
+        services.AddSingleton<IRabbitMqService, RabbitMqService>();
+        services.AddHostedService<StockBotWorker>();
         
+        // Clients
+        services.AddHttpClient<IStockApiService, StockApiService>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(10);
+            client.DefaultRequestHeaders.Add("User-Agent", "StockBot/1.0");
+        });
     }
     
     /// <summary>

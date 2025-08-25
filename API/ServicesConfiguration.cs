@@ -21,7 +21,7 @@ public static class ServicesConfiguration
 
         // Repositories
         services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlite(configuration.GetConnectionString("AppDbContext")));
 
         
         // Clients

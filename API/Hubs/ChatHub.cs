@@ -75,10 +75,9 @@ public class ChatHub : Hub
             // Publish the command to RabbitMQ (do not persist the command as a chat message)
             await _bus.PublishAsync(_rmqOptions.CommandsExchange, "stock.command", stockCommand);
 
-                // Acknowledge command received (optional)
-                await Clients.Caller.SendAsync("CommandAcknowledged", $"Stock command for {stockCode} received");
-                return; // Don't save stock commands to database
-            }
+            // Optionally acknowledge to the caller
+            // await Clients.Caller.SendAsync("CommandAcknowledged", $"Stock command for {stockCode} received");
+            return;
         }
 
         // Save regular message to database
