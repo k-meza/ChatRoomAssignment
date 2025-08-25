@@ -10,6 +10,7 @@
 @if (!State.IsAuthenticated)
 {
     <p style="padding:16px">Please sign in.</p>
+    <button @onclick="GoToLogin"> Go to Login</button>
 }
 else
 {
@@ -32,6 +33,8 @@ else
 }
 
 @code {
+    [Inject] public NavigationManager Nav { get; set; } = default!;
+    
     [Parameter] public Guid RoomId { get; set; }
 
     private List<ChatMessageDto> messages = new();
@@ -149,6 +152,8 @@ else
             }
         }
     }
+    
+    private void GoToLogin() => Nav.NavigateTo("/");
 }
 
 <script>
