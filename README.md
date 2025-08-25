@@ -75,11 +75,6 @@ This solution delivers a simple browser-based chat application using .NET 8 wher
 - Keep credentials and connection strings out of source control (use secrets or environment variables).
 - Enforce password policies and secure cookies for authentication.
 - Log with Serilog; ensure structured logging in production.
-- Monitor bot and broker health; protect against excessive resource usage or runaway loops.
-- Scale-out:
-  - API: horizontal scaling with sticky sessions if needed for SignalR or use Azure SignalR Service.
-  - Bot.Worker: multiple instances can be run consuming from the same queue.
-  - RabbitMQ: use durable queues and exchanges as appropriate.
 
 ## How to Run It
 
