@@ -96,7 +96,16 @@ This repo includes two helper scripts that boot everything in the right order (B
 >   ```
 >
 > - (Optional) Configure credentials/hosts in `appsettings.*.json` or environment variables (e.g., `RabbitMQ:HostName`, `RabbitMQ:UserName`, `RabbitMQ:Password`).
->
+
+### **_IMPORTANT:_ Configuration**
+
+Both API and Bot.Worker use their respective `appsettings.json` files for configuration.
+The .git repo is ignoring the configuration files by default so a `appsettings.json.template` file is included.`
+
+**Create a copy (or rename it) of the template file and name it `appsettings.json`. It includes the Development configuration by default.**
+
+This step is crucial to ensure the app can run.
+
 ### Quick Start
 
 By default the WebApp runs in the url: `http://localhost:5149`. And the API runs in the url: `http://localhost:5199`.
