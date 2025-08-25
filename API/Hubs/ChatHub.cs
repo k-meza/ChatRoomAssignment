@@ -6,6 +6,8 @@ using API.Repositories.AppDbContext.Entites;
 using API.Repositories.AppDbContext;
 using Microsoft.EntityFrameworkCore;
 using Common.Model;
+using API.Options;
+using Common.Helpers;
 
 namespace API.Hubs;
 
@@ -14,13 +16,18 @@ public class ChatHub : Hub
 {
     private readonly AppDbContext _db;
     private readonly UserManager<AppUser> _userManager;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IRabbitMqService _bus;
+    private readonly RabbitMqOptions _rmqOptions;
 
-    public ChatHub(AppDbContext db, UserManager<AppUser> userManager, IServiceProvider serviceProvider)
+    public ChatHub(AppDbContext db,
+        UserManager<AppUser> userManager,
+        IRabbitMqService bus,
+        RabbitMqOptions rmqOptions)
     {
         _db = db;
         _userManager = userManager;
-        _serviceProvider = serviceProvider;
+        _bus = bus;
+        _rmqOptions = rmqOptions;
     }
 
     public async Task JoinRoom(string roomId)
@@ -56,27 +63,17 @@ public class ChatHub : Hub
         var user = await _userManager.GetUserAsync(Context.User);
         if (user == null) return;
 
-        // Check if it's a stock command
-        if (content.StartsWith("/stock=", StringComparison.OrdinalIgnoreCase))
+        if (CommandParser.TryParseStock(content, out var stockCode))
         {
-            var stockCode = content.Substring(7).Trim();
-            if (!string.IsNullOrEmpty(stockCode))
+            var stockCommand = new StockCommand
             {
-                // Send stock command to message broker (you'll implement this service)
-                var stockCommand = new StockCommand
-                {
-                    StockCode = stockCode,
-                    RoomId = Guid.Parse(roomId),
-                    RequestUserId = user.Id
-                };
+                StockCode = stockCode,
+                RoomId = Guid.Parse(roomId),
+                RequestUserId = user.Id
+            };
 
-                // Inject and use your message broker service here
-                // For now, let's assume we have an IStockCommandService
-                var stockService = _serviceProvider.GetService<IStockCommandService>();
-                if (stockService != null)
-                {
-                    await stockService.ProcessStockCommandAsync(stockCommand);
-                }
+            // Publish the command to RabbitMQ (do not persist the command as a chat message)
+            await _bus.PublishAsync(_rmqOptions.CommandsExchange, "stock.command", stockCommand);
 
                 // Acknowledge command received (optional)
                 await Clients.Caller.SendAsync("CommandAcknowledged", $"Stock command for {stockCode} received");
@@ -111,12 +108,11 @@ public class ChatHub : Hub
 
     public async Task SendBotMessage(string roomId, string content, string botUserName = "StockBot")
     {
-        // This method will be called by the bot service
         var message = new Message
         {
             Content = content,
             UserName = botUserName,
-            UserId = null, // Bot messages don't have a user ID
+            UserId = null,
             ChatRoomId = Guid.Parse(roomId),
             CreatedAtUtc = DateTime.UtcNow,
             IsBotMessage = true
@@ -125,7 +121,6 @@ public class ChatHub : Hub
         _db.Messages.Add(message);
         await _db.SaveChangesAsync();
 
-        // Send bot message to all clients in the room
         await Clients.Group(roomId).SendAsync("ReceiveMessage", new
         {
             Id = message.Id,

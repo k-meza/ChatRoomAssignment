@@ -1,5 +1,6 @@
 using API.Domain.Messaging;
 using API.Domain.Messaging.Interfaces;
+using API.Options;
 using API.Repositories.AppDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -11,10 +12,11 @@ public static class ServicesConfiguration
     public static void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
         // Configuration
+        services.AddOptionsAsSelf<RabbitMqOptions>(configuration.GetSection("RabbitMqOptions"));
 
         
         // Domain
-        services.AddScoped<IStockCommandService, StockCommandService>();
+        services.AddSingleton<IRabbitMqService, RabbitMqService>();
 
 
         // Repositories

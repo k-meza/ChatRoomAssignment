@@ -1,6 +1,17 @@
 {
   "ConnectionStrings": {
-    "AppDbContext": ""
+    "AppDbContext": "Data Source=chatroom.db"
+  },
+  "RabbitMq": {
+    "HostName": "",
+    "UserName": "",
+    "Password": "",
+    "VirtualHost": "",
+    "Port": 5672,
+    "CommandsQueue": "",
+    "EventsQueue": "",
+    "CommandsExchange": "",
+    "EventsExchange": ""
   },
   "Serilog": {
     "MinimumLevel": {
