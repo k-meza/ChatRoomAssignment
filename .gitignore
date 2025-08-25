@@ -420,3 +420,4 @@ FodyWeavers.xsd
 # AppSettings
 API/appsettings.json
 Bot.Worker/appsettings.json
+.idea/.idea.ChatRoomAssignment/.idea/dataSources.xml
