@@ -3,13 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{D9422607-F46C-4FCB-B781-5E216DDDF0AE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B498E0CD-E2E3-4BC1-9F35-99CCB885428E} = {B498E0CD-E2E3-4BC1-9F35-99CCB885428E}
-		{F4397698-CFFB-4349-BCC9-D1653A919070} = {F4397698-CFFB-4349-BCC9-D1653A919070}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot.Worker", "Bot.Worker\Bot.Worker.csproj", "{B498E0CD-E2E3-4BC1-9F35-99CCB885428E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F4397698-CFFB-4349-BCC9-D1653A919070} = {F4397698-CFFB-4349-BCC9-D1653A919070}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{26C701A7-793E-44A7-894A-34E878078500}"
 EndProject
