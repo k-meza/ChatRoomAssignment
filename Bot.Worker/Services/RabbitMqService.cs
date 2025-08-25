@@ -30,7 +30,14 @@ public class RabbitMqService : IRabbitMqService, IDisposable
 
         _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
         _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
+
+        // Ensure infrastructure
+        // I'm aware this constitutes an anti-pattern. I made it this way to keep this assignment simple.
+        // The solution would be to create a separate service for this.
+        // I would create a Factory class that would create the service and return it.
+        EnsureInfrastructureAsync().GetAwaiter().GetResult();
     }
+
 
     public async Task PublishAsync<T>(string exchange, string routingKey, T message) where T : class
     {
@@ -52,11 +59,13 @@ public class RabbitMqService : IRabbitMqService, IDisposable
         }
     }
 
-
     public async Task StartConsumingAsync<T>(string queue, Func<T, Task> messageHandler) where T : class
     {
         try
         {
+            // Make sure infra exists also before consuming in case service restarted
+            await EnsureInfrastructureAsync();
+
             var consumer = new AsyncEventingBasicConsumer(_channel);
 
             consumer.ReceivedAsync += async (model, ea) =>
@@ -94,6 +103,32 @@ public class RabbitMqService : IRabbitMqService, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to start consuming from queue: {Queue}", queue);
+            throw;
+        }
+    }
+
+    private async Task EnsureInfrastructureAsync()
+    {
+        try
+        {
+            // Exchanges
+            await _channel.ExchangeDeclareAsync(_options.CommandsExchange, ExchangeType.Direct, durable: true);
+            await _channel.ExchangeDeclareAsync(_options.EventsExchange, ExchangeType.Direct, durable: true);
+
+            // Queues
+            await _channel.QueueDeclareAsync(_options.CommandsQueue, durable: true, exclusive: false,
+                autoDelete: false);
+            await _channel.QueueDeclareAsync(_options.EventsQueue, durable: true, exclusive: false, autoDelete: false);
+
+            // Bindings
+            await _channel.QueueBindAsync(_options.CommandsQueue, _options.CommandsExchange, "stock.command");
+            await _channel.QueueBindAsync(_options.EventsQueue, _options.EventsExchange, "bot.message");
+
+            _logger.LogInformation("RabbitMQ infrastructure ensured (exchanges, queues, bindings).");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to ensure RabbitMQ infrastructure");
             throw;
         }
     }

@@ -14,7 +14,7 @@ public static class ServicesConfiguration
 
         // Services
         services.AddSingleton<IRabbitMqService, RabbitMqService>();
-        services.AddHostedService<StockBotWorker>();
+        services.AddHostedService<StockBotWorker>();   
         
         // Clients
         services.AddHttpClient<IStockApiService, StockApiService>(client =>

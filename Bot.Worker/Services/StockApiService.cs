@@ -45,7 +45,7 @@ public class StockApiService : IStockApiService
             var symbol = values[0].Trim();
             var closePrice = values[6].Trim();
 
-            // Handle "N/D" values (No Data)
+            // Handle "N/D" values
             if (closePrice.Equals("N/D", StringComparison.OrdinalIgnoreCase) ||
                 !decimal.TryParse(closePrice, NumberStyles.Any, CultureInfo.InvariantCulture, out var price))
             {

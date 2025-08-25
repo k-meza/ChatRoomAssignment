@@ -1,8 +1,4 @@
 using Bot.Worker;
-using Bot.Worker.Options;
-using Bot.Worker.Services;
-using Bot.Worker.Services.Interfaces;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);

@@ -1,6 +1,6 @@
+using Bot.Worker.Model;
 using Bot.Worker.Options;
 using Bot.Worker.Services.Interfaces;
-using Common.Model;
 
 namespace Bot.Worker;
 
