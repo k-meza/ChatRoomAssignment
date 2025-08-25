@@ -10,6 +10,10 @@
         <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.19" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.19" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.19">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.19" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.19" />
         <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
@@ -18,10 +22,6 @@
         <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
 </Project>

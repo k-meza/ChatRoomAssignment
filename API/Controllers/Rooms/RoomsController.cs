@@ -9,17 +9,20 @@ namespace API.Controllers.Rooms;
 [Route("api/rooms")]
 public class RoomsController : ControllerBase
 {
+    private readonly ILogger<RoomsController> _logger;
     private readonly AppDbContext _db;
 
-    public RoomsController(AppDbContext db)
+    public RoomsController(AppDbContext db, ILogger<RoomsController> logger)
     {
         _db = db;
+        _logger = logger;
     }
 
     [HttpGet]
     [Authorize]
-    public async Task<IEnumerable<RoomDto>> GetRoom() =>
-        await _db.ChatRooms
+    public async Task<IEnumerable<RoomDto>> GetRoom()
+    {
+        return await _db.ChatRooms
             .OrderBy(r => r.Name)
             .Select(r => new RoomDto
             {
@@ -27,6 +30,7 @@ public class RoomsController : ControllerBase
                 Name = r.Name
             })
             .ToListAsync();
+    }
 
     [HttpPost]
     [Authorize]

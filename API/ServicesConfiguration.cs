@@ -1,6 +1,6 @@
 using API.Domain.Messaging;
 using API.Domain.Messaging.Interfaces;
-using API.Options;
+using API.Domain.Options;
 using API.Repositories.AppDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -17,6 +17,8 @@ public static class ServicesConfiguration
         
         // Domain
         services.AddSingleton<IRabbitMqService, RabbitMqService>();
+        services.AddHostedService<StockCommandConsumer>();
+
 
 
         // Repositories

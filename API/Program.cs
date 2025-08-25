@@ -3,6 +3,7 @@ using API.Hubs;
 using API.Repositories.AppDbContext;
 using API.Repositories.AppDbContext.Entites;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,8 +27,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
     options.LoginPath = "/api/auth/login";
     options.LogoutPath = "/api/auth/logout";
-    options.Cookie.SameSite = SameSiteMode.Lax;
 });
+
 
 builder.Services.AddSignalR(options =>
 {
@@ -51,7 +52,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "https://localhost:5173") // TODO: adjust for frontend
+        policy.WithOrigins("http://localhost:5149", "https://localhost:5173") // TODO: adjust for frontend
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -62,6 +63,24 @@ builder.Services.AddCors(options =>
 builder.Host.UseSerilog();
 
 var app = builder.Build();
+
+// Apply database migrations
+using (var scope = app.Services.CreateScope())
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await db.Database.MigrateAsync();
+        logger.LogInformation("Database migrated/created successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Failed to migrate/create the database.");
+        throw;
+    }
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -80,7 +99,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<ChatHub>("/chathub");
-
-
 
 app.Run();

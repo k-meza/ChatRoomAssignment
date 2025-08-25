@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using API.Domain.Messaging.Interfaces;
-using API.Options;
+using API.Domain.Options;
 using RabbitMQ.Client;
 
 namespace API.Domain.Messaging;
@@ -30,7 +30,10 @@ public class RabbitMqService : IRabbitMqService, IDisposable
         _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
         _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
 
-        // Declare exchanges and queues
+        // Ensure infrastructure
+        // I'm aware this constitutes an anti-pattern. I made it this way to keep this assignment simple.
+        // The solution would be to create a separate service for this.
+        // I would create a Factory class that would create the service and return it.
         DeclareInfrastructure().GetAwaiter().GetResult();
     }
 

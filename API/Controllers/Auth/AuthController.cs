@@ -10,13 +10,15 @@ namespace API.Controllers.Auth;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
+    private readonly ILogger<AuthController> _logger;
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signInManager;
 
-    public AuthController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+    public AuthController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ILogger<AuthController> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _logger = logger;
     }
 
     [HttpPost("register")]
@@ -61,7 +63,7 @@ public class AuthController : ControllerBase
         return Ok();
     }
 
-    // Handy for debugging auth state from the client
+    // For debugging auth state from the client
     [HttpGet("me")]
     public IActionResult Me()
         => User.Identity?.IsAuthenticated == true

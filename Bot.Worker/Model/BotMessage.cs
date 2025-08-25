@@ -1,4 +1,4 @@
-namespace Common.Model;
+namespace Bot.Worker.Model;
 
 public record BotMessage
 {

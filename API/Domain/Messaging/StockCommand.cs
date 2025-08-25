@@ -1,4 +1,4 @@
-namespace Common.Model;
+namespace API.Domain.Messaging;
 
 public record StockCommand
 {
