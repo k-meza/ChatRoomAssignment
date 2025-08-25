@@ -22,41 +22,90 @@ public class RoomsController : ControllerBase
     [Authorize]
     public async Task<IEnumerable<RoomDto>> GetRoom()
     {
-        return await _db.ChatRooms
-            .OrderBy(r => r.Name)
-            .Select(r => new RoomDto
-            {
-                Id = r.Id,
-                Name = r.Name
-            })
-            .ToListAsync();
+        var userName = User.Identity?.Name;
+        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+        
+        _logger.LogInformation("User {UserName} requesting rooms list (IP: {ClientIp})", userName, clientIp);
+        
+        try
+        {
+            var rooms = await _db.ChatRooms
+                .OrderBy(r => r.Name)
+                .Select(r => new RoomDto
+                {
+                    Id = r.Id,
+                    Name = r.Name
+                })
+                .ToListAsync();
+
+            _logger.LogInformation("Successfully retrieved {RoomCount} rooms for user {UserName} (IP: {ClientIp})", 
+                rooms.Count, userName, clientIp);
+            
+            return rooms;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve rooms for user {UserName} (IP: {ClientIp})", userName, clientIp);
+            throw;
+        }
     }
 
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> CreateRoom([FromBody] CreateRoomRequest request)
     {
+        var userName = User.Identity?.Name;
+        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var roomName = request.Name?.Trim();
+        
+        _logger.LogInformation("User {UserName} attempting to create room '{RoomName}' (IP: {ClientIp})", 
+            userName, roomName, clientIp);
+        
         if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            _logger.LogWarning("Room creation failed for user {UserName}: Empty room name (IP: {ClientIp})", 
+                userName, clientIp);
             return BadRequest("Room name is required");
+        }
 
-        var existingRoom = await _db.ChatRooms
-            .FirstOrDefaultAsync(r => r.Name == request.Name.Trim());
-
-        if (existingRoom != null)
-            return Conflict("Room with this name already exists");
-
-        var room = new API.Repositories.AppDbContext.Entites.ChatRoom
+        try
         {
-            Name = request.Name.Trim()
-        };
+            var existingRoom = await _db.ChatRooms
+                .FirstOrDefaultAsync(r => r.Name == roomName);
 
-        _db.ChatRooms.Add(room);
-        await _db.SaveChangesAsync();
+            if (existingRoom != null)
+            {
+                _logger.LogWarning("Room creation failed for user {UserName}: Room '{RoomName}' already exists (ID: {ExistingRoomId}) (IP: {ClientIp})", 
+                    userName, roomName, existingRoom.Id, clientIp);
+                return Conflict("Room with this name already exists");
+            }
 
-        return Ok(new RoomDto
+            var room = new API.Repositories.AppDbContext.Entites.ChatRoom
+            {
+                Name = roomName
+            };
+
+            _db.ChatRooms.Add(room);
+            await _db.SaveChangesAsync();
+
+            _logger.LogInformation("User {UserName} successfully created room '{RoomName}' (ID: {RoomId}) (IP: {ClientIp})", 
+                userName, roomName, room.Id, clientIp);
+
+            // Count total rooms for monitoring
+            var totalRooms = await _db.ChatRooms.CountAsync();
+            _logger.LogInformation("Total rooms in system: {TotalRooms}", totalRooms);
+
+            return Ok(new RoomDto
+            {
+                Id = room.Id,
+                Name = room.Name
+            });
+        }
+        catch (Exception ex)
         {
-            Id = room.Id,
-            Name = room.Name
-        });
+            _logger.LogError(ex, "Failed to create room '{RoomName}' for user {UserName} (IP: {ClientIp})", 
+                roomName, userName, clientIp);
+            throw;
+        }
     }
 }
