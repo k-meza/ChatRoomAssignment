@@ -1,16 +1,33 @@
-﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+﻿@using WebApp.Services
+@inherits LayoutComponentBase
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <h1>ChatRooms</h1>
+            <div class="actions">
+                @if (State.IsAuthenticated)
+                {
+                    <span class="badge">Signed in as @State.UserName</span>
+                    <button class="btn danger" @onclick="Logout">Logout</button>
+                }
+            </div>
         </div>
-
-        <article class="content px-4">
+        <div class="body">
             @Body
-        </article>
-    </main>
+        </div>
+    </div>
 </div>
+
+@code {
+    [Inject] public AppState State { get; set; } = default!;
+    [Inject] public AuthService Auth { get; set; } = default!;
+    [Inject] public NavigationManager Nav { get; set; } = default!;
+
+    private async Task Logout()
+    {
+        if (!State.IsAuthenticated) return;
+        await Auth.LogoutAsync();
+        State.ClearUser();
+        Nav.NavigateTo("/");
+    }
+}

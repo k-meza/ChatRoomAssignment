@@ -1,0 +1,26 @@
+@page "/"
+@using WebApp.Services
+
+@if (!State.IsAuthenticated)
+{
+    <div class="form">
+        <div class="grid-2">
+            <RegisterForm />
+            <LoginForm />
+        </div>
+    </div>
+}
+else
+{
+    <div class="form">
+        <div class="stack">
+            <h3>Welcome</h3>
+            <p>You are already signed in as <strong>@State.UserName</strong>.</p>
+            <a class="btn primary" href="/rooms">Go to rooms</a>
+        </div>
+    </div>
+}
+
+@code {
+    [Inject] public AppState State { get; set; } = default!;
+}

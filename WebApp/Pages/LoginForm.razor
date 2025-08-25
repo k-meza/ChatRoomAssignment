@@ -1,0 +1,35 @@
+@using WebApp.Services
+<div class="stack">
+    <h3>Login</h3>
+    <input class="input" placeholder="Username" @bind="model.UserName" />
+    <input class="input" placeholder="Password" type="password" @bind="model.Password" />
+    <button class="btn primary" @onclick="Login">Sign in</button>
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <small style="color:#fca5a5">@error</small>
+    }
+</div>
+
+@code {
+    private LoginRequest model = new();
+    private string? error;
+
+    [Inject] public AuthService Auth { get; set; } = default!;
+    [Inject] public AppState State { get; set; } = default!;
+    [Inject] public NavigationManager Nav { get; set; } = default!;
+
+    private async Task Login()
+    {
+        error = null;
+        var res = await Auth.LoginAsync(model);
+        if (!res.ok)
+        {
+            error = res.error;
+        }
+        else
+        {
+            State.SetUser(res.user!);
+            Nav.NavigateTo("/rooms"); // redirect after successful login
+        }
+    }
+}

@@ -1,0 +1,40 @@
+@using WebApp.Services
+<div class="stack">
+    <h3>Register</h3>
+    <input class="input" placeholder="Username" @bind="model.UserName" />
+    <input class="input" placeholder="Password" type="password" @bind="model.Password" />
+    <button class="btn success" @onclick="Register">Create account</button>
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <small style="color:#fca5a5">@error</small>
+    }
+    @if (!string.IsNullOrWhiteSpace(success))
+    {
+        <small style="color:#86efac">@success</small>
+    }
+</div>
+
+@code {
+    private RegisterRequest model = new();
+    private string? error;
+    private string? success;
+
+    [Inject] public AuthService Auth { get; set; } = default!;
+    [Inject] public AppState State { get; set; } = default!;
+
+    private async Task Register()
+    {
+        error = null;
+        success = null;
+        var res = await Auth.RegisterAsync(model);
+        if (!res.ok)
+        {
+            error = res.error;
+        }
+        else
+        {
+            State.SetUser(res.user!);
+            success = "Successfully registered.";
+        }
+    }
+}

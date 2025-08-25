@@ -1,0 +1,77 @@
+@page "/rooms"
+@using WebApp.Services
+
+@if (!State.IsAuthenticated)
+{
+    <p>Please sign in to see rooms.</p>
+}
+else
+{
+    <div class="form">
+        <div class="stack">
+            <div style="display:flex; gap:8px;">
+                <input class="input" placeholder="New room name" @bind="newRoom" />
+                <button class="btn success" @onclick="CreateRoom">Create</button>
+            </div>
+            <div class="list">
+                @if (rooms is null)
+                {
+                    <em class="muted">Loading...</em>
+                }
+                else if (rooms.Count == 0)
+                {
+                    <em class="muted">No rooms yet. Create one!</em>
+                }
+                else
+                {
+                    @foreach (var r in rooms)
+                    {
+                        <div class="item">
+                            <div>
+                                <strong>@r.Name</strong>
+                                <div class="meta">@r.Id</div>
+                            </div>
+                            <button class="btn" @onclick="() => GoChat(r.Id)">Join</button>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Inject] public RoomsService RoomsSvc { get; set; } = default!;
+    [Inject] public AppState State { get; set; } = default!;
+    [Inject] public NavigationManager Nav { get; set; } = default!;
+    [Inject] public AuthService Auth { get; set; } = default!;
+
+    private List<RoomDto>? rooms;
+    private string newRoom = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!State.IsAuthenticated)
+        {
+            // Hydrate state from server-side cookie if present
+            var ok = await Auth.MeAsync();
+            if (!ok) return;
+        }
+
+        rooms = await RoomsSvc.GetRoomsAsync();
+    }
+
+    private async Task CreateRoom()
+    {
+        if (string.IsNullOrWhiteSpace(newRoom)) return;
+        var created = await RoomsSvc.CreateRoomAsync(new CreateRoomRequest { Name = newRoom.Trim() });
+        if (created is not null)
+        {
+            rooms ??= new();
+            rooms.Add(created);
+            newRoom = "";
+        }
+    }
+
+    private void GoChat(Guid id) => Nav.NavigateTo($"/chat/{id}");
+}
