@@ -1,3 +1,7 @@
+using API.Domain.Messaging;
+using API.Domain.Messaging.Interfaces;
+using API.Repositories.AppDbContext;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace API;
@@ -9,13 +13,13 @@ public static class ServicesConfiguration
         // Configuration
 
         
-        // Hubs
-
-
         // Domain
+        services.AddScoped<IStockCommandService, StockCommandService>();
 
 
         // Repositories
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
         
         // Clients
